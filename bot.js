@@ -47,9 +47,12 @@ const getSeason = today => {
 }
 
 const sendCelebrations = (id, celebrations) => {
-    let message = 'Витаю з:\n\n✅';
+    const today = new Date();
+    const season = getSeason(today);
+    const imagesUrl = `https://source.unsplash.com/random/1600x900/?nature, ${season}&${today.getTime()}`;
+    let message = 'Поздравляю с:\n\n✅';
     message += celebrations.join('\n\n✅')
-    bot.telegram.sendMessage(id, message);
+    bot.telegram.sendPhoto(id, imagesUrl, { caption: message});
 }
 
 const stop = reason => {
