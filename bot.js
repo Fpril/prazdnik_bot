@@ -73,7 +73,7 @@ bot.start(async ctx => {
     schedule.cancelJob(birthday);
     schedule.cancelJob(nameDay1);
     schedule.cancelJob(nameDay2);
-    job = schedule.scheduleJob({rule: '0 0 * * *', tz: 'Europe/Kiev'},
+    job = schedule.scheduleJob({rule: '0 8 * * *', tz: 'Europe/Kiev'},
     () => sendCelebrations(ctx.chat.id, celebrations));
     birthday = schedule.scheduleJob({rule :'0 0 9 10 *', tz: 'Europe/Kiev'},
     () => ctx.reply('С ДНЬОМ РОДЖЕНИЯ!!🎉!🎂💞'));
