@@ -9,8 +9,6 @@ rule = '0 0 * * *',
 dataParses = ['div.listing_wr div div.main span[itemprop="text"]', 'article.name-days-day table'];
 let job = {};
 
-// bot.telegram.setWebhook('https://prazdnikbot.herokuapp.com/' + bot.telegram.token);
-
 const getPages = async () => {
     const pages = [];
     for (url of dataUrls) {
@@ -153,5 +151,3 @@ bot.launch();
 
 process.once('SIGINT', () => stop('SIGINT'));
 process.once('SIGTERM', () => stop('SIGTERM'));
-
-// module.exports = bot;
