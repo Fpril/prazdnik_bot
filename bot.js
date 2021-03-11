@@ -1,5 +1,5 @@
 const { Telegraf } = require('telegraf'),
-bot = new Telegraf('1699318886:AAGwLmHIQkmZ2k9aqCbAJxbO-Ytrp60vvks', {polling: true}),
+bot = new Telegraf('1699318886:AAGwLmHIQkmZ2k9aqCbAJxbO-Ytrp60vvks'),
 request = require('request'),
 cheerio = require('cheerio'),
 schedule = require('node-schedule'),
@@ -8,6 +8,8 @@ dataUrls = ['http://kakoysegodnyaprazdnik.ru/', 'https://my-calend.ru/name-days/
 rule = '0 0 * * *',
 dataParses = ['div.listing_wr div div.main span[itemprop="text"]', 'article.name-days-day table'];
 let job = {};
+
+bot.telegram.setWebhook('https://prazdnikbot.herokuapp.com/secret-path');
 
 const getPages = async () => {
     const pages = [];
@@ -151,7 +153,7 @@ bot.on('message', ctx => {
 
 initBot();
 
-bot.launch();
+bot.startWebhook('/secret-path', null, process.env.PORT || 5000);
 
 process.once('SIGINT', () => stop('SIGINT'));
 process.once('SIGTERM', () => stop('SIGTERM'));
