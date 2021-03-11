@@ -1,5 +1,5 @@
 const { Telegraf } = require('telegraf'),
-bot = new Telegraf('1699318886:AAGwLmHIQkmZ2k9aqCbAJxbO-Ytrp60vvks'),
+bot = new Telegraf('1699318886:AAGwLmHIQkmZ2k9aqCbAJxbO-Ytrp60vvks', { polling: true }),
 request = require('request'),
 cheerio = require('cheerio'),
 schedule = require('node-schedule'),
