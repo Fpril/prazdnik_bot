@@ -9,7 +9,7 @@ rule = '0 0 * * *',
 dataParses = ['div.listing_wr div div.main span[itemprop="text"]', 'article.name-days-day table'];
 let job = {};
 
-bot.telegram.setWebhook('https://prazdnikbot.herokuapp.com/secret-path');
+bot.telegram.setWebhook('https://prazdnikbot.herokuapp.com/');
 
 const getPages = async () => {
     const pages = [];
@@ -153,7 +153,7 @@ bot.on('message', ctx => {
 
 initBot();
 
-bot.startWebhook('/secret-path', null, process.env.PORT || 5000);
+bot.startWebhook('/', null, process.env.PORT || 5000);
 
 process.once('SIGINT', () => stop('SIGINT'));
 process.once('SIGTERM', () => stop('SIGTERM'));
