@@ -21,11 +21,4 @@ mongoose.connection.on('disconnected', () => {
     console.log(disconnected("Mongoose default connection is disconnected"));
 });
 
-process.on('SIGINT', () => {
-    mongoose.connection.close(() => {
-        console.log(termination("Mongoose default connection is disconnected due to application termination"));
-        process.exit(0);
-    });
-});
-
 module.exports = mongoose;

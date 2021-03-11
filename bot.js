@@ -125,6 +125,10 @@ const stop = reason => {
     birthday.cancel(false);
     nameDay1.cancel(false);
     nameDay2.cancel(false);
+    mongoose.connection.close(() => {
+        console.log(termination("Mongoose default connection is disconnected due to application termination"));
+        process.exit(0);
+    });
 }
 
 bot.start(async ctx => {
