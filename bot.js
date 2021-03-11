@@ -1,32 +1,59 @@
 const { Telegraf } = require('telegraf'),
-bot = new Telegraf('1699318886:AAGwLmHIQkmZ2k9aqCbAJxbO-Ytrp60vvks'),
+bot = new Telegraf('1699318886:AAGwLmHIQkmZ2k9aqCbAJxbO-Ytrp60vvks', {polling: true}),
 request = require('request'),
 cheerio = require('cheerio'),
 schedule = require('node-schedule'),
-celebrationsUrl = 'http://kakoysegodnyaprazdnik.ru/';
-let job, birthday, nameDay1, nameDay2;
+User = require('./user.model'),
+dataUrls = ['http://kakoysegodnyaprazdnik.ru/', 'https://my-calend.ru/name-days/today'],
+rule = '0 0 * * *',
+dataParses = ['div.listing_wr div div.main span[itemprop="text"]', 'article.name-days-day table'];
+let job = {};
 
-bot.telegram.setWebhook('https://prazdnikbot.herokuapp.com/' + bot.telegram.token);
+// bot.telegram.setWebhook('https://prazdnikbot.herokuapp.com/' + bot.telegram.token);
 
-const getHtml = async () => {
-    const html = await new Promise((resolve, reject) => {
-        request.get(celebrationsUrl, (err, res, body) => {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(body);
-            }
+const getPages = async () => {
+    const pages = [];
+    for (url of dataUrls) {
+        const html = await new Promise((resolve, reject) => {
+            request.get(url, (err, res, body) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(body);
+                }
+            });
         });
-    });
-    return html;
+        pages.push(html);
+    }
+    return pages;
 }
 
-const getCelebrations = html => {
-    const celebrations = [];
-    const $ = cheerio.load(html);
-    $('div.listing_wr div div.main span[itemprop="text"]')
-    .each((i, celebration) => celebrations.push($(celebration).text()));
-    return celebrations;
+const getMessages = pages => {
+    const messages = {
+        celebrations: [],
+        nameDays: {
+            men: [],
+            girls: []
+        }
+    };
+
+    let $ = cheerio.load(pages[0]);
+    $(dataParses[0]).each((i, celebration) => messages.celebrations.push($(celebration).text()));
+
+    $ = cheerio.load(pages[1]);
+    $(dataParses[1]).each((i, table) => {
+        const names = [];
+        $('tr td a', table).each((i, name) => names.push($(name).text()));
+        switch($(table.previousSibling).text()) {
+            case 'Мужчины':
+                messages.nameDays.men = names;
+                break;
+            case 'Женщины':
+                messages.nameDays.girls = names;
+        }
+    });
+
+    return messages;
 }
 
 const getSeason = today => {
@@ -46,13 +73,52 @@ const getSeason = today => {
     return season;
 }
 
-const sendCelebrations = (id, celebrations) => {
+const sendMessages = async user => {
     const today = new Date();
     const season = getSeason(today);
-    const imagesUrl = `https://source.unsplash.com/random/1600x900/?nature, ${season}&${today.getTime()}`;
-    let message = 'Поздравляю с:\n\n✅';
-    message += celebrations.join('\n\n✅')
-    bot.telegram.sendPhoto(id, imagesUrl, { caption: message});
+    const imageUrl = `https://source.unsplash.com/random/1600x900/?nature, ${season}&${today.getTime()}`;
+    const pages = await getPages();
+    const messages = getMessages(pages);
+    let message = `Праздники каждый день 🎉✨🎆🌯\n\n🗓${today.toLocaleDateString()}\n\nПоздравляю с:\n\n✅`;
+    message += messages.celebrations.join('\n\n✅');
+    message += '\n\nИменины у:';
+    if (messages.nameDays.men.length) {
+        message += `\n\n🕺🏻🕺🏻🕺🏻 ${messages.nameDays.men.join(', ')}`;
+    }
+    if (messages.nameDays.girls.length) {
+        message += `\n\n💃🏻💃🏻💃🏻 ${messages.nameDays.girls.join(', ')}`;
+    }
+    bot.telegram.sendPhoto(user.chatId, imageUrl, { caption: message});
+}
+
+const saveUser = data => {
+    const user = new User(data);
+    user.save((error, user) => {
+        if (error) {
+            console.log(`user already created: {name: ${data.name}, chatId: ${data.chatId}}`);
+        } else {
+            console.log(`saved: {name: ${user.name}, chatId: ${user.chatId}}`);
+        }
+    });
+}
+
+const doJob = user => {
+    schedule.cancelJob(job[user.name]);
+    job[user.name] = schedule.scheduleJob({rule: rule, tz: 'Europe/Kiev'},
+    () => sendMessages(user));
+}
+
+const initBot = () => {
+    User.find({}, (error, users) => {
+        if (error) {
+            console.log(error);
+        } else {
+            users.forEach(user => {
+                job[user.name] = schedule.scheduleJob({rule: rule, tz: 'Europe/Kiev'},
+                () => sendMessages(user));
+            });
+        }
+    });
 }
 
 const stop = reason => {
@@ -64,43 +130,28 @@ const stop = reason => {
 }
 
 bot.start(async ctx => {
-    const today = new Date();
-    const season = getSeason(today);
-    const imagesUrl = `https://source.unsplash.com/random/1600x900/?nature, ${season}&${today.getTime()}`;    
-
-    await ctx.replyWithPhoto(imagesUrl, { caption: 'Праздники каждый день 🎉✨🎆🌯' });
-
-    const html = await getHtml();
-    const celebrations = getCelebrations(html);
-    schedule.cancelJob(job);
-    schedule.cancelJob(birthday);
-    schedule.cancelJob(nameDay1);
-    schedule.cancelJob(nameDay2);
-    job = schedule.scheduleJob({rule: '0 8 * * *', tz: 'Europe/Kiev'},
-    () => sendCelebrations(ctx.chat.id, celebrations));
-    birthday = schedule.scheduleJob({rule :'0 0 9 10 *', tz: 'Europe/Kiev'},
-    () => ctx.reply('С ДНЬОМ РОДЖЕНИЯ!!🎉!🎂💞'));
-    nameDay1 = schedule.scheduleJob({rule: '0 0 27 8 *', tz: 'Europe/Kiev'},
-    () => ctx.reply('ПОЗДОРОВЛЯЮ С ИМЕНИНАМИ❤️🧡💛💚💙💜🤍🖤'));
-    nameDay2 = schedule.scheduleJob({rule: '0 0 2 12 *', tz: 'Europe/Kiev'},
-    () => ctx.reply('ПОЗДОРОВЛЯЮ С ИМЕНИНАМИ❤️🧡💛💚💙💜🤍🖤'));
-
-    sendCelebrations(ctx.chat.id, celebrations);
+    const user = {name: ctx.chat.username, chatId: ctx.chat.id};
+    saveUser(user);     
+    await sendMessages(user);
+    doJob(user);
 });
+
+bot.help(ctx => ctx.reply('Список доступных команд:\n\n/start - начало работы\n/again - поздравить заново'));
 
 bot.command('again', async ctx => {
-    const html = await getHtml();
-    const celebrations = getCelebrations(html);
-    sendCelebrations(ctx.chat.id, celebrations);
+    const user = {name: ctx.chat.username, chatId: ctx.chat.id}
+    sendMessages(user);
 });
-
-bot.command('help', ctx => ctx.reply('Список доступных команд:\n\n/start - начало работы\n/again - поздравить заново'));
 
 bot.on('message', ctx => {
     ctx.reply('Отпиши моему хозяину в личку пжжж🙏🏻\n@f_pril');
 });
 
+initBot();
+
+bot.launch();
+
 process.once('SIGINT', () => stop('SIGINT'));
 process.once('SIGTERM', () => stop('SIGTERM'));
 
-module.exports = bot;
+// module.exports = bot;
