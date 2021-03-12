@@ -1,5 +1,5 @@
 const { Telegraf } = require('telegraf'),
-bot = new Telegraf('1699318886:AAGwLmHIQkmZ2k9aqCbAJxbO-Ytrp60vvks', { polling: true }),
+bot = new Telegraf(process.env.BOT_TOKEN, { polling: true }),
 request = require('request'),
 cheerio = require('cheerio'),
 schedule = require('node-schedule'),
@@ -9,7 +9,7 @@ rule = '0 0 * * *',
 dataParses = ['div.listing_wr div div.main span[itemprop="text"]', 'article.name-days-day table'];
 let job = {};
 
-bot.telegram.setWebhook('https://prazdnikbot.herokuapp.com/');
+bot.telegram.setWebhook('https://prazdnikbot.herokuapp.com/secret-path');
 
 const getPages = async () => {
     const pages = [];
@@ -128,7 +128,7 @@ const stop = reason => {
     nameDay1.cancel(false);
     nameDay2.cancel(false);
     mongoose.connection.close(() => {
-        console.log(termination("Mongoose default connection is disconnected due to application termination"));
+        console.log("Mongoose default connection is disconnected due to application termination");
         process.exit(0);
     });
 }
@@ -153,7 +153,7 @@ bot.on('message', ctx => {
 
 initBot();
 
-bot.startWebhook('/', null, process.env.PORT || 5000);
-
 process.once('SIGINT', () => stop('SIGINT'));
 process.once('SIGTERM', () => stop('SIGTERM'));
+
+module.exports = bot;
