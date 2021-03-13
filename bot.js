@@ -88,8 +88,7 @@ const sendMessages = async user => {
     if (messages.nameDays.girls.length) {
         message += `\n\n💃🏻💃🏻💃🏻 ${messages.nameDays.girls.join(', ')}`;
     }
-    message = message.split(/[()]/).join('\\(');
-    bot.telegram.sendPhoto(user.chatId, imageUrl, { caption: message, parse_mode: 'MarkdownV2'});
+    bot.telegram.sendPhoto(user.chatId, imageUrl, { caption: message, parse_mode: 'Markdown'});
 }
 
 const saveUser = data => {
