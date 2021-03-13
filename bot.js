@@ -106,7 +106,6 @@ const doJob = user => {
     schedule.cancelJob(job[user.chatId.toString()]);
     job[user.chatId.toString()] = schedule.scheduleJob({rule: rule, tz: 'Europe/Kiev'},
     () => sendMessages(user));
-    console.log(job)
 }
 
 const initBot = () => {
