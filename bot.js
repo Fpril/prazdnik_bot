@@ -79,16 +79,16 @@ const sendMessages = async user => {
     const imageUrl = `https://source.unsplash.com/random/1600x900/?nature, ${season}&${today.getTime()}`;
     const pages = await getPages();
     const messages = getMessages(pages);
-    let message = `**Праздники каждый день** 🎉✨🎆🌯\n\n🗓${today.toLocaleDateString('en-US', {timeZone: 'Europe/Kiev'})}\n\n**Поздравляю с:**\n\n✅`;
+    let message = `*Праздники каждый день* 🎉✨🎆🌯\n\n🗓${today.toLocaleDateString('en-GB', {timeZone: 'Europe/Kiev'})}\n\n*Поздравляю с:*\n\n✅`;
     message += messages.celebrations.join('\n\n✅');
-    message += '\n\n**Именины у:**';
+    message += '\n\n*Именины у:*';
     if (messages.nameDays.men.length) {
         message += `\n\n🕺🏻🕺🏻🕺🏻 ${messages.nameDays.men.join(', ')}`;
     }
     if (messages.nameDays.girls.length) {
         message += `\n\n💃🏻💃🏻💃🏻 ${messages.nameDays.girls.join(', ')}`;
     }
-    bot.telegram.sendPhoto(user.chatId, imageUrl, { caption: message, parse_mode: 'Markdown'});
+    bot.telegram.sendPhoto(user.chatId, imageUrl, { caption: message, parse_mode: 'MarkdownV2'});
 }
 
 const saveUser = data => {
@@ -115,6 +115,7 @@ const initBot = () => {
         } else {
             users.forEach(user => {
                 doJob(user);
+                bot.telegram.sendMessage(user.chatId, 'Приношу извинения за технические неполадки!');
                 sendMessages(user);
             });
         }
