@@ -88,6 +88,7 @@ const sendMessages = async user => {
     if (messages.nameDays.girls.length) {
         message += `\n\n💃🏻💃🏻💃🏻 ${messages.nameDays.girls.join(', ')}`;
     }
+    message = message.split('(').join('\\(');
     bot.telegram.sendPhoto(user.chatId, imageUrl, { caption: message, parse_mode: 'MarkdownV2'});
 }
 
@@ -115,8 +116,9 @@ const initBot = () => {
         } else {
             users.forEach(user => {
                 doJob(user);
-                bot.telegram.sendMessage(user.chatId, 'Приношу извинения за технические неполадки!');
-                sendMessages(user);
+                if (user.name == 'f_pril') {
+                    sendMessages(user);
+                }
             });
         }
     });
