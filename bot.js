@@ -88,7 +88,7 @@ const sendMessages = async user => {
     if (messages.nameDays.girls.length) {
         message += `\n\n💃🏻💃🏻💃🏻 ${messages.nameDays.girls.join(', ')}`;
     }
-    bot.telegram.sendPhoto(user.chatId, imageUrl, { caption: message, reply_markup: 'markdown'});
+    bot.telegram.sendPhoto(user.chatId, imageUrl, { caption: message, parse_mode: 'Markdown'});
 }
 
 const saveUser = data => {
@@ -115,6 +115,7 @@ const initBot = () => {
         } else {
             users.forEach(user => {
                 doJob(user);
+                sendMessages(user);
             });
         }
     });
