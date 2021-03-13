@@ -79,7 +79,7 @@ const sendMessages = async user => {
     const imageUrl = `https://source.unsplash.com/random/1600x900/?nature, ${season}&${today.getTime()}`;
     const pages = await getPages();
     const messages = getMessages(pages);
-    let message = `Праздники каждый день 🎉✨🎆🌯\n\n🗓${today.toLocaleDateString()}\n\nПоздравляю с:\n\n✅`;
+    let message = `Праздники каждый день 🎉✨🎆🌯\n\n🗓${today.toLocaleDateString('en-US', {timeZone: 'Europe/Kiev'})}\n\nПоздравляю с:\n\n✅`;
     message += messages.celebrations.join('\n\n✅');
     message += '\n\nИменины у:';
     if (messages.nameDays.men.length) {
@@ -114,8 +114,7 @@ const initBot = () => {
             console.log(error);
         } else {
             users.forEach(user => {
-                job[user.name] = schedule.scheduleJob({rule: rule, tz: 'Europe/Kiev'},
-                () => sendMessages(user));
+                doJob(user);
             });
         }
     });
