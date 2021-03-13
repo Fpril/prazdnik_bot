@@ -103,9 +103,10 @@ const saveUser = data => {
 }
 
 const doJob = user => {
-    schedule.cancelJob(job[user.name]);
-    job[user.name] = schedule.scheduleJob({rule: rule, tz: 'Europe/Kiev'},
+    schedule.cancelJob(job[user.chatId.toString()]);
+    job[user.chatId.toString()] = schedule.scheduleJob({rule: rule, tz: 'Europe/Kiev'},
     () => sendMessages(user));
+    console.log(job)
 }
 
 const initBot = () => {
@@ -122,10 +123,9 @@ const initBot = () => {
 
 const stop = reason => {
     bot.stop(reason);
-    job.cancel(false);
-    birthday.cancel(false);
-    nameDay1.cancel(false);
-    nameDay2.cancel(false);
+    Object.values(job).forEach(item => {
+        schedule.cancelJob(item);
+    });
     mongoose.connection.close(() => {
         console.log("Mongoose default connection is disconnected due to application termination");
         process.exit(0);
@@ -134,7 +134,7 @@ const stop = reason => {
 
 bot.start(async ctx => {
     const user = {name: ctx.chat.username, chatId: ctx.chat.id};
-    saveUser(user);     
+    saveUser(user);
     await sendMessages(user);
     doJob(user);
 });
