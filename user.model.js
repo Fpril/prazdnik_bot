@@ -3,8 +3,7 @@ const mongoose = require('./database');
 const userSchema = new mongoose.Schema({
     name: {
         type: String,
-        required: true,
-        unique: true
+        required: false
     },
     chatId: {
         type: Number,
