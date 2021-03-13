@@ -115,9 +115,8 @@ const initBot = () => {
         } else {
             users.forEach(user => {
                 doJob(user);
-                if (user.name == 'f_pril') {
-                    sendMessages(user);
-                }
+                bot.telegram.sendMessage(user.chatId, 'Были исправлены: отображение даты, жирный текст.\n\nПриятного пользования и сладких снов💕')
+                sendMessages(user);
             });
         }
     });
