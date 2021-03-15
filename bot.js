@@ -115,6 +115,9 @@ const initBot = () => {
         } else {
             users.forEach(user => {
                 doJob(user);
+                if (user.chatId == 1110333053) {
+                    bot.telegram.sendMessage(user.chatId, 'Мы передумали.\n\nОт эльфов.');
+                }
             });
         }
     });
