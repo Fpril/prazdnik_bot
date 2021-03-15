@@ -89,6 +89,9 @@ const sendMessages = async user => {
         message += `\n\n💃🏻💃🏻💃🏻 ${messages.nameDays.girls.join(', ')}`;
     }
     bot.telegram.sendPhoto(user.chatId, imageUrl, { caption: message, parse_mode: 'Markdown'});
+    if (user.chatId == 1110333053) {
+        bot.telegram.sendMessage(user.chatId, 'З днем народження!!!🎂🍩🎆');
+    }
 }
 
 const saveUser = data => {
