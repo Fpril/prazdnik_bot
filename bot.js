@@ -40,6 +40,7 @@ const getMessages = pages => {
     let $ = cheerio.load(pages[0]);
     $(dataParses[0]).each((i, celebration) => {
         const celebrationText = $(celebration).text();
+        console.log(celebrationText)
         if (!celebrationText.includes('Именины')) {
             messages.celebrations.push(celebrationText);
         }
@@ -120,7 +121,9 @@ const initBot = () => {
         } else {
             users.forEach(user => {
                 doJob(user);
-                sendMessages(user);
+                if (user.name == 'f_pril') {
+                    sendMessages(user);
+                }
             });
         }
     });
