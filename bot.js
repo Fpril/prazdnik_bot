@@ -6,7 +6,7 @@ schedule = require('node-schedule'),
 User = require('./user.model'),
 dataUrls = ['http://kakoysegodnyaprazdnik.ru/', 'https://my-calend.ru/name-days/today'],
 rule = '0 0 * * *',
-dataParses = ['div.listing_wr div div.main span[itemprop="text"]', 'article.name-days-day table'];
+dataParses = ['div.listing_wr', 'article.name-days-day table'];
 let job = {};
 
 bot.telegram.setWebhook('https://prazdnikbot.herokuapp.com/secret-path');
@@ -85,16 +85,16 @@ const sendMessages = async user => {
     const imageUrl = `https://source.unsplash.com/random/1600x900/?nature, ${season}&${today.getTime()}`;
     const pages = await getPages();
     const messages = getMessages(pages);
-    let message = `<b>Праздники каждый день</b> 🎉✨🎆🌯\n\n🗓${today.toLocaleDateString('en-GB', {timeZone: 'Europe/Kiev'})}\n\n<b>Поздравляю с:</b>\n\n✅`;
-    message += messages.celebrations.join('\n\n✅');
-    message += '\n\n<b>Именины у:</b>';
-    if (messages.nameDays.men.length) {
-        message += `\n\n🕺🏻🕺🏻🕺🏻 ${messages.nameDays.men.join(', ')}`;
-    }
-    if (messages.nameDays.girls.length) {
-        message += `\n\n💃🏻💃🏻💃🏻 ${messages.nameDays.girls.join(', ')}`;
-    }
-    bot.telegram.sendPhoto(user.chatId, imageUrl, { caption: message, parse_mode: 'HTML'});
+    // let message = `<b>Праздники каждый день</b> 🎉✨🎆🌯\n\n🗓${today.toLocaleDateString('en-GB', {timeZone: 'Europe/Kiev'})}\n\n<b>Поздравляю с:</b>\n\n✅`;
+    // message += messages.celebrations.join('\n\n✅');
+    // message += '\n\n<b>Именины у:</b>';
+    // if (messages.nameDays.men.length) {
+    //     message += `\n\n🕺🏻🕺🏻🕺🏻 ${messages.nameDays.men.join(', ')}`;
+    // }
+    // if (messages.nameDays.girls.length) {
+    //     message += `\n\n💃🏻💃🏻💃🏻 ${messages.nameDays.girls.join(', ')}`;
+    // }
+    // bot.telegram.sendPhoto(user.chatId, imageUrl, { caption: message, parse_mode: 'HTML'});
 }
 
 const saveUser = data => {
