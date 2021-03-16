@@ -38,7 +38,7 @@ const getMessages = pages => {
     };
 
     let $ = cheerio.load(pages[0]);
-    console.log($(dataParses[0]))
+    console.log($(dataParses[0]).text())
     $(dataParses[0]).each((i, celebration) => {
         const celebrationText = $(celebration).text();
         if (!celebrationText.includes('Именины')) {
