@@ -38,7 +38,12 @@ const getMessages = pages => {
     };
 
     let $ = cheerio.load(pages[0]);
-    $(dataParses[0]).each((i, celebration) => messages.celebrations.push($(celebration).text()));
+    $(dataParses[0]).each((i, celebration) => {
+        const celebrationText = $(celebration).text();
+        if (!celebrationText.includes('Именины')) {
+            messages.celebrations.push(celebrationText);
+        }
+    });
 
     $ = cheerio.load(pages[1]);
     $(dataParses[1]).each((i, table) => {
@@ -79,16 +84,16 @@ const sendMessages = async user => {
     const imageUrl = `https://source.unsplash.com/random/1600x900/?nature, ${season}&${today.getTime()}`;
     const pages = await getPages();
     const messages = getMessages(pages);
-    let message = `*Праздники каждый день* 🎉✨🎆🌯\n\n🗓${today.toLocaleDateString('en-GB', {timeZone: 'Europe/Kiev'})}\n\n*Поздравляю с:*\n\n✅`;
+    let message = `<b>Праздники каждый день</b> 🎉✨🎆🌯\n\n🗓${today.toLocaleDateString('en-GB', {timeZone: 'Europe/Kiev'})}\n\n<b>Поздравляю с:</b>\n\n✅`;
     message += messages.celebrations.join('\n\n✅');
-    message += '\n\n*Именины у:*';
+    message += '\n\n<b>Именины у:</b>';
     if (messages.nameDays.men.length) {
         message += `\n\n🕺🏻🕺🏻🕺🏻 ${messages.nameDays.men.join(', ')}`;
     }
     if (messages.nameDays.girls.length) {
         message += `\n\n💃🏻💃🏻💃🏻 ${messages.nameDays.girls.join(', ')}`;
     }
-    bot.telegram.sendPhoto(user.chatId, imageUrl, { caption: message, parse_mode: 'Markdown'});
+    bot.telegram.sendPhoto(user.chatId, imageUrl, { caption: message, parse_mode: 'HTML'});
 }
 
 const saveUser = data => {
@@ -115,6 +120,7 @@ const initBot = () => {
         } else {
             users.forEach(user => {
                 doJob(user);
+                sendMessages(user);
             });
         }
     });
