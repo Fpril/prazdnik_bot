@@ -4,9 +4,9 @@ request = require('request'),
 cheerio = require('cheerio'),
 schedule = require('node-schedule'),
 User = require('./user.model'),
-dataUrls = ['http://kakoysegodnyaprazdnik.ru/', 'https://my-calend.ru/name-days/today'],
+dataUrls = ['https://kakoysegodnyaprazdnik.ru/', 'https://my-calend.ru/name-days/today'],
 rule = '0 0 * * *',
-dataParses = ['div#main_frame', 'article.name-days-day table'];
+dataParses = ['div#main_frame div.listing div.listing_wr div div.main span[itemprop="text"]', 'article.name-days-day table'];
 let job = {};
 
 bot.telegram.setWebhook('https://prazdnikbot.herokuapp.com/secret-path');
